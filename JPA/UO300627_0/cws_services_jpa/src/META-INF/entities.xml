@@ -1,0 +1,391 @@
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+    version="2.0">
+    
+    <package>uo.ri.cws.domain</package>
+    <access>FIELD</access>
+
+    <mapped-superclass class="uo.ri.cws.domain.BaseEntity">
+        <attributes>
+            <id name="id"/>
+            <version name="version"/>
+        </attributes>
+    </mapped-superclass>
+
+    <embeddable class="Address">
+        <attributes>
+            <basic name="street" optional="false">
+                <column name="street"/>
+            </basic>
+            <basic name="city" optional="false">
+                <column name="city"/>
+            </basic>
+            <basic name="zipCode" optional="false">
+                <column name="zipCode"/>
+            </basic>
+        </attributes>
+    </embeddable>
+    
+    <entity class="Mechanic">
+        <table name="TMECHANICS"/>
+        <attributes>
+            <basic name="nif">
+                <column name="nif" unique="true"/>
+            </basic>
+            <basic name="surname">
+                <column name="surname"/>
+            </basic>
+            <basic name="name">
+                <column name="name"/>
+            </basic>
+            <one-to-many name="assigned" mapped-by="mechanic"/>
+            <one-to-many name="interventions" mapped-by="mechanic"/>
+            <one-to-many name="contracts" mapped-by="mechanic"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Cash">
+        <table name="TCASHES"/>
+    </entity>
+
+    <entity class="Charge">
+    <table name="TCHARGES"/>
+    <attributes>
+        <basic name="amount">
+            <column name="amount"/>
+        </basic>
+        <many-to-one name="invoice"/> 
+        <many-to-one name="paymentMean"/>
+    </attributes>
+	</entity>
+    
+    <entity class="Client">
+        <table name="TCLIENTS"/>
+        <attributes>
+            <basic name="nif">
+                <column name="nif" unique="true"/>
+            </basic>
+            <basic name="name">
+                <column name="name"/>
+            </basic>
+            <basic name="surname">
+                <column name="surname"/>
+            </basic>
+            <basic name="email">
+                <column name="email"/>
+            </basic>
+            <basic name="phone">
+                <column name="phone"/>
+            </basic>
+            <one-to-many name="vehicles" mapped-by="client"/>
+            <one-to-many name="paymentMeans" mapped-by="client"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Contract">
+        <table name="TCONTRACTS"/>
+        <attributes>
+            <basic name="startDate">
+                <column name="startDate"/>
+            </basic>
+            <basic name="endDate">
+                <column name="endDate"/>
+            </basic>
+            <basic name="annualBaseSalary">
+                <column name="annualBaseSalary"/>
+            </basic>
+            <basic name="taxRate">
+                <column name="taxRate"/>
+            </basic>
+            <basic name="settlement">
+                <column name="settlement"/>
+            </basic>
+            <basic name="state">
+                <column name="state"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+            <many-to-one name="professionalGroup"/>
+            <many-to-one name="contractType"/>
+            <many-to-one name="mechanic"/>
+            <one-to-many name="payrolls" mapped-by="contract"/>
+        </attributes>
+    </entity>
+    
+    <entity class="ContractType">
+        <table name="TCONTRACTTYPES"/>
+        <attributes>
+            <basic name="name">
+                <column name="name" unique="true"/>
+            </basic>
+            <basic name="compensationDaysPerYear">
+                <column name="compensationDaysPerYear"/>
+            </basic>
+            <one-to-many name="contracts" mapped-by="contractType"/>
+        </attributes>
+    </entity>
+    
+    <entity class="CreditCard">
+        <table name="TCREDITCARDS"/>
+        <attributes>
+            <basic name="number">
+                <column name="number" unique="true"/>
+            </basic>
+            <basic name="type">
+                <column name="type"/>
+            </basic>
+            <basic name="validThru">
+                <column name="validThru"/>
+            </basic>
+        </attributes>
+    </entity>
+    
+    <entity class="Intervention">
+        <table name="TINTERVENTIONS">
+            <unique-constraint>
+                <column-name>date</column-name>
+                <column-name>mechanic_id</column-name>
+                <column-name>workOrder_id</column-name>
+            </unique-constraint>
+        </table>
+        <attributes>
+            <basic name="date">
+                <column name="date"/>
+            </basic>
+            <basic name="minutes">
+                <column name="minutes"/>
+            </basic>
+            <many-to-one name="workOrder"/>
+            <many-to-one name="mechanic"/>
+            <one-to-many name="substitutions" mapped-by="intervention"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Invoice">
+        <table name="TINVOICES"/>
+        <attributes>
+            <basic name="number">
+                <column name="number" unique="true"/>
+            </basic>
+            <basic name="date">
+                <column name="date"/>
+            </basic>       
+            <basic name="amount">
+                <column name="amount"/>
+            </basic>
+            <basic name="vat">
+                <column name="vat"/>
+            </basic>
+            <basic name="state">
+                <column name="state"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+            
+            <one-to-many name="workOrders" mapped-by="invoice"/>
+            <one-to-many name="charges" mapped-by="invoice"/>
+        </attributes>
+    </entity>
+    
+    <entity class="PaymentMean" abstract="true">
+        <table name="TPAYMENTMEANS"/>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <basic name="accumulated">
+                <column name="accumulated"/>
+            </basic>
+            
+            <many-to-one name="client"/>
+            
+            <one-to-many name="charges" mapped-by="paymentMean"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Payroll">
+        <table name="TPAYROLLS">
+            <unique-constraint>
+                <column-name>contract_id</column-name>
+                <column-name>date</column-name>
+            </unique-constraint>
+        </table>
+        <attributes>
+            <basic name="date">
+                <column name="date"/>
+            </basic>
+            <basic name="baseSalary">
+                <column name="baseSalary"/>
+            </basic>
+            <basic name="extraSalary">
+                <column name="extraSalary"/>
+            </basic>
+            <basic name="productivityEarning">
+                <column name="productivityEarning"/>
+            </basic>
+            <basic name="trienniumEarning">
+                <column name="trienniumEarning"/>
+            </basic>
+            <basic name="taxDeduction">
+                <column name="taxDeduction"/>
+            </basic>
+            <basic name="nicDeduction">
+                <column name="nicDeduction"/>
+            </basic>
+            
+            <many-to-one name="contract"/>
+        </attributes>
+    </entity>
+    
+    <entity class="ProfessionalGroup">
+        <table name="TPROFESSIONALGROUPS"/>
+        <attributes>
+            <basic name="name">
+                <column name="name" unique="true"/>
+            </basic>
+            
+            <basic name="trienniumPayment">
+                <column name="trienniumPayment"/>
+            </basic>
+            
+            <basic name="productivityRate">
+                <column name="productivityRate"/>
+            </basic>
+            
+            <one-to-many name="contracts" mapped-by="professionalGroup"/>
+        </attributes>
+    </entity>
+    
+    <entity class="SparePart">
+        <table name="TSPAREPARTS"/>
+        <attributes>
+            <basic name="code">
+                <column name="code" unique="true"/>
+            </basic>
+            
+            <basic name="description">
+                <column name="description"/>
+            </basic>
+            
+            <basic name="price">
+                <column name="price"/>
+            </basic>
+            
+            <basic name="stock">
+                <column name="stock"/>
+            </basic>
+            
+            <basic name="minStock">
+                <column name="minStock"/>
+            </basic>
+            
+            <basic name="maxStock">
+                <column name="maxStock"/>
+            </basic>
+            
+            <one-to-many name="substitutions" mapped-by="sparePart"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Substitution">
+        <table name="TSUBSTITUTIONS">
+            <unique-constraint>
+                <column-name>sparePart_id</column-name>
+                <column-name>intervention_id</column-name>
+            </unique-constraint>
+        </table>
+        <attributes>
+            <basic name="quantity">
+                <column name="quantity"/>
+            </basic>
+            
+            <many-to-one name="sparePart"/>
+            
+            <many-to-one name="intervention"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Vehicle">
+        <table name="TVEHICLES"/>
+        <attributes>
+            <basic name="plateNumber">
+                <column name="plateNumber" unique="true"/>
+            </basic>
+            
+            <basic name="make">
+                <column name="make"/>
+            </basic>
+            
+            <basic name="model">
+                <column name="model"/>
+            </basic>
+            
+            <many-to-one name="client"/>
+            
+            <many-to-one name="vehicleType"/>
+            
+            <one-to-many name="workOrders" mapped-by="vehicle"/>
+        </attributes>
+    </entity>
+    
+    <entity class="VehicleType">
+        <table name="TVEHICLETYPES"/>
+        <attributes>
+            <basic name="name">
+                <column name="name" unique="true"/>
+            </basic>
+            
+            <basic name="pricePerHour">
+                <column name="pricePerHour"/>
+            </basic>
+            
+            <one-to-many name="vehicles" mapped-by="vehicleType"/>
+        </attributes>
+    </entity>
+    
+    <entity class="Voucher">
+        <table name="TVOUCHERS"/>
+        <attributes>
+            <basic name="code">
+                <column name="code" unique="true"/>
+            </basic>
+            
+            <basic name="available">
+                <column name="available"/>
+            </basic>
+            
+            <basic name="description">
+                <column name="description"/>
+            </basic>
+        </attributes>
+    </entity>
+    
+    <entity class="WorkOrder">
+        <table name="TWORKORDERS">
+            <unique-constraint>
+                <column-name>date</column-name>
+                <column-name>vehicle_id</column-name>
+            </unique-constraint>
+        </table>
+        <attributes>
+            <basic name="date">
+                <column name="date"/>
+            </basic>
+            
+            <basic name="description">
+                <column name="description"/>
+            </basic>
+            
+            <basic name="amount">
+                <column name="amount"/>
+            </basic>
+            
+            <basic name="state">
+                <column name="state"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+                       
+            <many-to-one name="vehicle"/>            
+            <many-to-one name="mechanic"/>           
+            <many-to-one name="invoice"/>            
+            <one-to-many name="interventions" mapped-by="workOrder"/>
+        </attributes>
+    </entity>
+</entity-mappings>

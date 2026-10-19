@@ -1,0 +1,5 @@
+[EL Info]: 2025-11-18 15:36:15.821--ServerSession(1716795394)--EclipseLink, version: Eclipse Persistence Services - 4.0.7.v202506240759-923a428d4722d199eff24e730890e156ce7ea9de
+[EL Fine]: sql: 2025-11-18 15:36:16.632--ServerSession(1716795394)--Connection(411745492)--SELECT ID, CREATEDAT, ENTITYSTATE, name, nif, surname, UPDATEDAT, VERSION FROM TMECHANICS WHERE (ID = ?)
+	bind => [i]
+[EL Fine]: sql: 2025-11-18 15:36:37.337--ServerSession(1716795394)--Connection(411745492)--SELECT ID, baseSalary, CREATEDAT, date, ENTITYSTATE, extraSalary, nicDeduction, productivityEarning, taxDeduction, trienniumEarning, UPDATEDAT, VERSION, CONTRACT_ID FROM TPAYROLLS WHERE (date BETWEEN ? AND ?)
+	bind => [2025-10-01, 2025-10-31]
